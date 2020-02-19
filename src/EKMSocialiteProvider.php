@@ -9,6 +9,8 @@ use Lcobucci\JWT\Parser;
 
 class EKMSocialiteProvider extends AbstractProvider
 {
+    protected $scopeSeparator = ' ';
+
     /**
      * Get the authentication URL for the provider.
      *
