@@ -40,15 +40,11 @@ class EKMSocialiteProvider extends AbstractProvider
      */
     protected function getUserByToken($token)
     {
-        $userUrl = 'https://api.ekm.net/2.0/user?access_token='.$token;
-
-        $response = $this->getHttpClient()->get(
-            $userUrl
-        );
-
-        $user = json_decode($response->getBody(), true);
-
-        $user['email'] = $this->getEmailByToken($token);
+        $parsedToken = (new Parser())->parse($token);
+        $user = [
+            'sub' => $parsedToken->getClaim('sub'),
+            'server_id' => $parsedToken->getClaim('ServerId')
+        ];
 
         return $user;
     }
@@ -59,8 +55,8 @@ class EKMSocialiteProvider extends AbstractProvider
     protected function mapUserToObject(array $user)
     {
         return (new User())->setRaw($user)->map([
-            'id' => $user['uuid'], 'nickname' => $user['username'], 'name' => Arr::get($user, 'display_name'),
-            'email' => Arr::get($user, 'email'), 'avatar' => Arr::get($user, 'avatar_url'),
+            'id' => $user['sub'],
+            'server_id' => $user['server_id'],
         ]);
     }
 
@@ -85,22 +81,6 @@ class EKMSocialiteProvider extends AbstractProvider
      */
     protected function getEmailByToken($token)
     {
-        $emailsUrl = 'https://api.ekm.net/2.0/user/emails?access_token='.$token;
-
-        try {
-            $response = $this->getHttpClient()->get(
-                $emailsUrl
-            );
-        } catch (\Exception $e) {
-            return;
-        }
-
-        foreach (json_decode($response->getBody(), true)['values'] as $email) {
-            if ($email['is_primary'] && $email['is_confirmed']) {
-                return $email['email'];
-            }
-        }
-
         return '';
     }
 }
