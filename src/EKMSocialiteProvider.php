@@ -2,9 +2,8 @@
 
 namespace Mrstebo\LaravelSocialiteEKM;
 
-use Illuminate\Support\Arr;
-use Laravel\Socialite\Two\User;
 use Laravel\Socialite\Two\AbstractProvider;
+use Laravel\Socialite\Two\User;
 use Lcobucci\JWT\Parser;
 
 class EKMSocialiteProvider extends AbstractProvider
@@ -43,7 +42,7 @@ class EKMSocialiteProvider extends AbstractProvider
         $parsedToken = (new Parser())->parse($token);
         $user = [
             'sub' => $parsedToken->getClaim('sub'),
-            'server_id' => $parsedToken->getClaim('ServerId')
+            'server_id' => $parsedToken->getClaim('ServerId'),
         ];
 
         return $user;
